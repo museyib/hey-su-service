@@ -1,0 +1,17 @@
+package az.inci.heysu.model;
+
+import lombok.Data;
+
+@Data
+public class MonthlySaleReport {
+    private String invCode;
+    private String invName;
+    private String brandCode;
+    private double saleQty;
+    private double mainWhsQty;
+    private double t20WhsQty;
+    private double t29WhsQty;
+    private double priceStd;
+    private double priceP01;
+    private double priceVp4;
+}
