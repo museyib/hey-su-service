@@ -68,7 +68,10 @@ public class ReportService {
                         ISNULL(WS_T29.WHS_QTY, 0) AS WHS_QTY_T29,
                         PL_S.PRICE AS PRICE_STD,
                         PL_P.PRICE AS PRICE_P01,
-                        PL_V.PRICE AS PRICE_VP4
+                        PL_V.PRICE AS PRICE_VP4,
+                        ISNULL(WS_G.RZV_QTY, 0) AS RZV_QTY_G,
+                        ISNULL(WS_T20.RZV_QTY, 0) AS RZV_QTY_T20,
+                        ISNULL(WS_T29.RZV_QTY, 0) AS RZV_QTY_T29
                         FROM INV_MASTER IM
                             LEFT JOIN
                         (
@@ -82,7 +85,8 @@ public class ReportService {
                             LEFT JOIN
                         (
                            SELECT INV_CODE,
-                            SUM(WHS_QTY) WHS_QTY
+                            SUM(WHS_QTY) WHS_QTY,
+                            SUM(RZV_QTY) RZV_QTY
                            FROM WHS_SUM
                            WHERE WHS_CODE IN ('01', '11', '13', '15')
                            GROUP BY INV_CODE
@@ -90,7 +94,8 @@ public class ReportService {
                             LEFT JOIN
                         (
                            SELECT INV_CODE,
-                            SUM(WHS_QTY) WHS_QTY
+                            SUM(WHS_QTY) WHS_QTY,
+                            SUM(RZV_QTY) RZV_QTY
                            FROM WHS_SUM
                            WHERE WHS_CODE IN ('T20')
                            GROUP BY INV_CODE
@@ -98,7 +103,8 @@ public class ReportService {
                             LEFT JOIN
                         (
                            SELECT INV_CODE,
-                            SUM(WHS_QTY) WHS_QTY
+                            SUM(WHS_QTY) WHS_QTY,
+                            SUM(RZV_QTY) RZV_QTY
                            FROM WHS_SUM
                            WHERE WHS_CODE IN ('T29')
                            GROUP BY INV_CODE
@@ -109,7 +115,7 @@ public class ReportService {
                                                         AND PL_P.PRICE_CODE = 'P01'
                             LEFT JOIN PRICE_LIST PL_V ON IM.INV_CODE = PL_V.INV_CODE
                                                         AND PL_V.PRICE_CODE = 'VP4'
-                        WHERE IM.INV_BRAND_CODE IN('SILSIL', 'ION')
+                        WHERE IM.PRODUCER_CODE IN('1239')
                         OR IM.INV_CODE IN('a035398', 'a035338', 'a035335')
                         ORDER BY IM.INV_BRAND_CODE,IM.INV_CODE;""");
         query.setParameter("START_DATE", startDate);
@@ -136,6 +142,9 @@ public class ReportService {
             reportItem.setPriceStd(Double.parseDouble(String.valueOf(item[7])));
             reportItem.setPriceP01(Double.parseDouble(String.valueOf(item[8])));
             reportItem.setPriceVp4(Double.parseDouble(String.valueOf(item[9])));
+            reportItem.setMainRzvQty(Double.parseDouble(String.valueOf(item[10])));
+            reportItem.setT20RzvQty(Double.parseDouble(String.valueOf(item[11])));
+            reportItem.setT29RzvQty(Double.parseDouble(String.valueOf(item[12])));
 
             result.add(reportItem);
         }
