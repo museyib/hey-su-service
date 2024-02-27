@@ -36,7 +36,6 @@ public class ReportController {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             return ResponseEntity.ok(Response.builder()
                     .statusCode(1)
                     .systemMessage(e.getMessage())
@@ -59,7 +58,6 @@ public class ReportController {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             return ResponseEntity.ok(Response.builder()
                     .statusCode(1)
                     .systemMessage(e.getMessage())
