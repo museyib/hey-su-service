@@ -30,12 +30,25 @@ public class WhsService
 
         return getWhsList(result, query);
     }
+
     public List<Whs> getWhsListForHeybe()
     {
         List<Whs> result = new ArrayList<>();
         Query query = entityManager.createNativeQuery("""
                  SELECT WHS_CODE, WHS_NAME FROM WHS_MASTER
                  WHERE WHS_CODE IN ('N001', 'N002', 'S033', 'S015', 'S038')""");
+
+        return getWhsList(result, query);
+    }
+
+    public List<Whs> getWhsListForUser(String userId)
+    {
+        List<Whs> result = new ArrayList<>();
+        Query query = entityManager.createNativeQuery("""
+                 SELECT WM.WHS_CODE, WHS_NAME FROM WHS_MASTER WM
+                 JOIN BMS_USER_WHS BUW ON WM.WHS_CODE = BUW.WHS_CODE
+                                            AND BUW.USER_ID = :USER_ID""");
+        query.setParameter("USER_ID", userId);
 
         return getWhsList(result, query);
     }

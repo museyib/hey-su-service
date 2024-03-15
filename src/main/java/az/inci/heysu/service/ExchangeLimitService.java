@@ -71,7 +71,11 @@ public class ExchangeLimitService
                     BE.LIMIT,
                     BE.QTY,
                     BE.VALID_DAYS,
-                    ISNULL(DATEDIFF(DAY, dbo.FN_GET_LAST_SALE_DATE(BE.INV_CODE,BE.BP_CODE), GETDATE()), 0) AS DAYS_FROM_LAST_SALE
+                    CASE
+                        WHEN BE.QTY > 0
+                        THEN ISNULL(DATEDIFF(DAY, dbo.FN_GET_LAST_SALE_DATE(BE.INV_CODE,BE.BP_CODE), GETDATE()), 0)
+                        ELSE 0
+                    END AS DAYS_FROM_LAST_SALE
                 FROM BP_EXCH BE
                 JOIN INV_MASTER IM ON BE.INV_CODE = IM.INV_CODE
                 JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE""");

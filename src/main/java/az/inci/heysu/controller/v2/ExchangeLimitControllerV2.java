@@ -4,14 +4,18 @@ import az.inci.heysu.model.ExchangeInfo;
 import az.inci.heysu.model.ExchangeUpdateRequest;
 import az.inci.heysu.model.Response;
 import az.inci.heysu.service.ExchangeLimitService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static az.inci.heysu.Utilities.getMessage;
+
 @RestController
 @RequestMapping("/v2/exchange")
+@Slf4j
 public class ExchangeLimitControllerV2
 {
     private ExchangeLimitService service;
@@ -28,18 +32,13 @@ public class ExchangeLimitControllerV2
         try
         {
             service.updateExchangeLimit(request);
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .developerMessage("Məlumat uğurla yeniləndi")
-                                             .build());
+            return ResponseEntity.ok(Response.getSuccessResponse());
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 
@@ -49,18 +48,13 @@ public class ExchangeLimitControllerV2
         try
         {
             service.insertExchangeLimit(request);
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .developerMessage("Məlumat uğurla daxil edildi")
-                                             .build());
+            return ResponseEntity.ok(Response.getSuccessResponse());
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
     @GetMapping("/info")
@@ -68,19 +62,14 @@ public class ExchangeLimitControllerV2
     {
         try
         {
-            List<ExchangeInfo> data = service.getExchangeInfoList();
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .data(data)
-                                             .build());
+            List<ExchangeInfo> result = service.getExchangeInfoList();
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 }

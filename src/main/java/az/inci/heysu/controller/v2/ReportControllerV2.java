@@ -5,6 +5,7 @@ import az.inci.heysu.model.Response;
 import az.inci.heysu.model.SaleStockReport;
 import az.inci.heysu.model.StockReport;
 import az.inci.heysu.service.ReportService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static az.inci.heysu.Utilities.getMessage;
+
 @RestController
 @RequestMapping("/v2/report")
+@Slf4j
 public class ReportControllerV2
 {
 
@@ -31,19 +35,14 @@ public class ReportControllerV2
     {
         try
         {
-            List<MonthlySaleReport> data = service.getSaleReport();
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(0)
-                    .data(data)
-                    .build());
+            List<MonthlySaleReport> result = service.getSaleReport();
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(1)
-                    .systemMessage(e.getMessage())
-                    .developerMessage("Server xətası")
-                    .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 
@@ -53,19 +52,14 @@ public class ReportControllerV2
     {
         try
         {
-            List<MonthlySaleReport> data = service.getSaleReportFromDateInterval(startDate, endDate);
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(0)
-                    .data(data)
-                    .build());
+            List<MonthlySaleReport> result = service.getSaleReportFromDateInterval(startDate, endDate);
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(1)
-                    .systemMessage(e.getMessage())
-                    .developerMessage("Server xətası")
-                    .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 
@@ -74,19 +68,14 @@ public class ReportControllerV2
     {
         try
         {
-            List<StockReport> data = service.getIsmiStockReport(whsCode);
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .data(data)
-                                             .build());
+            List<StockReport> result = service.getIsmiStockReport(whsCode);
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 
@@ -95,19 +84,14 @@ public class ReportControllerV2
     {
         try
         {
-            List<StockReport> data = service.getHeybeStockReport(whsCode);
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .data(data)
-                                             .build());
+            List<StockReport> result = service.getHeybeStockReport(whsCode);
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 
@@ -118,19 +102,14 @@ public class ReportControllerV2
     {
         try
         {
-            List<SaleStockReport> data = service.getHeybeSaleStockReport(whsCode, startDate, endDate);
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(0)
-                                             .data(data)
-                                             .build());
+            List<SaleStockReport> result = service.getHeybeSaleStockReport(whsCode, startDate, endDate);
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)
         {
-            return ResponseEntity.ok(Response.builder()
-                                             .statusCode(1)
-                                             .systemMessage(e.getMessage())
-                                             .developerMessage("Server xətası")
-                                             .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 }

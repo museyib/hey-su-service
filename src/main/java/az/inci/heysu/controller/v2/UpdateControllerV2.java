@@ -1,7 +1,7 @@
 package az.inci.heysu.controller.v2;
 
 import az.inci.heysu.model.Response;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static az.inci.heysu.Utilities.getMessage;
+
 @RequestMapping("/v2")
 @RestController
+@Slf4j
 public class UpdateControllerV2
 {
 
@@ -24,20 +27,14 @@ public class UpdateControllerV2
         {
             File file = new File(fileName.concat(".apk"));
             Path path = Paths.get(file.getPath());
-            byte[] bytes = Files.readAllBytes(path);
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(0)
-                    .data(bytes)
-                    .build());
+            byte[] result = Files.readAllBytes(path);
+            return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch(IOException e)
         {
-            e.printStackTrace();
-            return ResponseEntity.ok(Response.builder()
-                    .statusCode(1)
-                    .developerMessage("Server xətası")
-                    .systemMessage(e.toString())
-                    .build());
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
 }
