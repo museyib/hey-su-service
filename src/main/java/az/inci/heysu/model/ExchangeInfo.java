@@ -13,4 +13,6 @@ public class ExchangeInfo
     private Integer exchangeQuantity;
     private Integer validDays;
     private Integer daysFromLastSale;
+    private String phone;
+    private String address;
 }

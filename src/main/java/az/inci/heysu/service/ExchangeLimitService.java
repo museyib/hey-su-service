@@ -75,10 +75,13 @@ public class ExchangeLimitService
                         WHEN BE.QTY > 0
                         THEN ISNULL(DATEDIFF(DAY, dbo.FN_GET_LAST_SALE_DATE(BE.INV_CODE,BE.BP_CODE), GETDATE()), 0)
                         ELSE 0
-                    END AS DAYS_FROM_LAST_SALE
+                    END AS [DAYS_FROM_LAST_SALE],
+                    ISNULL(BM.PHONE1, '') AS PHONE,
+                    ISNULL(BM.ADDRESS1, '') AS ADDRESS
                 FROM BP_EXCH BE
                 JOIN INV_MASTER IM ON BE.INV_CODE = IM.INV_CODE
-                JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE""");
+                JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE
+                ORDER BY BE.LIMIT - BE.QTY, [DAYS_FROM_LAST_SALE]""");
 
         List<Object[]> resultList = query.getResultList();
 
@@ -93,6 +96,8 @@ public class ExchangeLimitService
             exchangeInfo.setExchangeQuantity((int) Double.parseDouble((String.valueOf(item[5]))));
             exchangeInfo.setValidDays((int) Double.parseDouble((String.valueOf(item[6]))));
             exchangeInfo.setDaysFromLastSale((int) Double.parseDouble((String.valueOf(item[7]))));
+            exchangeInfo.setPhone(String.valueOf(item[8]));
+            exchangeInfo.setAddress(String.valueOf(item[9]));
 
             result.add(exchangeInfo);
         }
