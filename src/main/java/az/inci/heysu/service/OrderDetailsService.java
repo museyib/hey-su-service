@@ -45,11 +45,10 @@ public class OrderDetailsService
                 FROM OINV_TRX OT
                 JOIN ORD_DOC OD ON OT.TRX_NO = OD.TRX_NO
                 JOIN BMS_REC_STATUS BRS ON BRS.REC_STATUS = OD.REC_STATUS
-                JOIN INV_MASTER IM ON OT.INV_CODE = IM.INV_CODE
+                JOIN INV_MASTER IM ON OT.INV_CODE = IM.INV_CODE AND IM.RELATED_INV_CODE != ''
                 LEFT JOIN BP_EXCH BE ON OD.BP_CODE = BE.BP_CODE
                                         AND IM.RELATED_INV_CODE = BE.INV_CODE
-                WHERE OT.INV_CODE = 'a035335'
-                        AND OT.TRX_TYPE_ID = 3
+                WHERE OT.TRX_TYPE_ID = 3
                         AND OD.REC_STATUS in (2, 3)
                 ORDER BY OT.TRX_NO DESC""");
 
