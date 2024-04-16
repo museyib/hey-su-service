@@ -57,12 +57,33 @@ public class ExchangeLimitControllerV2
             return ResponseEntity.ok(Response.getServerErrorResponse(message));
         }
     }
-    @GetMapping("/info")
-    public ResponseEntity<Response> getInfo()
+
+    @GetMapping("/info-grouped")
+    public ResponseEntity<Response> getInfoGrouped()
     {
         try
         {
-            List<ExchangeInfo> result = service.getExchangeInfoList();
+            List<ExchangeInfo> result = service.getExchangeInfoGrouped();
+            return ResponseEntity.ok(Response.getResultResponse(result));
+        }
+        catch (Exception e)
+        {
+            String message = getMessage(e);
+            log.error(message);
+            return ResponseEntity.ok(Response.getServerErrorResponse(message));
+        }
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<Response> getInfo(@RequestParam(value = "inv-code", required = false) String invCode)
+    {
+        try
+        {
+            List<ExchangeInfo> result;
+            if (invCode != null)
+                result = service.getExchangeInfoList(invCode);
+            else
+                result = service.getExchangeInfoList();
             return ResponseEntity.ok(Response.getResultResponse(result));
         }
         catch (Exception e)

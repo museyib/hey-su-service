@@ -58,7 +58,34 @@ public class ExchangeLimitService
         query.executeUpdate();
     }
 
-    @SuppressWarnings("unchecked")
+    public List<ExchangeInfo> getExchangeInfoGrouped()
+    {
+        List<ExchangeInfo> result = new ArrayList<>();
+
+        Query query = entityManager.createNativeQuery("""
+                SELECT BE.INV_CODE,
+                    IM.INV_NAME,
+                    SUM(BE.QTY) AS QTY
+                FROM BP_EXCH BE
+                JOIN INV_MASTER IM ON BE.INV_CODE = IM.INV_CODE
+                JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE
+                GROUP BY BE.INV_CODE, IM.INV_NAME
+                ORDER BY BE.INV_CODE""");
+        List<Object[]> resultList = query.getResultList();
+
+        for (Object[] item : resultList)
+        {
+            ExchangeInfo exchangeInfo = new ExchangeInfo();
+            exchangeInfo.setInvCode(String.valueOf(item[0]));
+            exchangeInfo.setInvName(String.valueOf(item[1]));
+            exchangeInfo.setExchangeQuantity((int) Double.parseDouble((String.valueOf(item[2]))));
+
+            result.add(exchangeInfo);
+        }
+
+        return result;
+    }
+
     public List<ExchangeInfo> getExchangeInfoList()
     {
         List<ExchangeInfo> result = new ArrayList<>();
@@ -77,12 +104,51 @@ public class ExchangeLimitService
                         ELSE 0
                     END AS [DAYS_FROM_LAST_SALE],
                     ISNULL(BM.PHONE1, '') AS PHONE,
-                    ISNULL(BM.ADDRESS1, '') AS ADDRESS
+                    ISNULL(BM.ADDRESS1, '') AS ADDRESS,
+                    NULL,
+                    NULL
                 FROM BP_EXCH BE
                 JOIN INV_MASTER IM ON BE.INV_CODE = IM.INV_CODE
                 JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE
                 ORDER BY BE.LIMIT - BE.QTY, [DAYS_FROM_LAST_SALE]""");
 
+        return getExchangeInfos(result, query);
+    }
+
+    public List<ExchangeInfo> getExchangeInfoList(String invCode)
+    {
+        List<ExchangeInfo> result = new ArrayList<>();
+
+        Query query = entityManager.createNativeQuery("""
+                SELECT BE.INV_CODE,
+                    IM.INV_NAME,
+                    BE.BP_CODE,
+                    BM.BP_NAME,
+                    BE.LIMIT,
+                    BE.QTY,
+                    BE.VALID_DAYS,
+                    CASE
+                        WHEN BE.QTY > 0
+                        THEN ISNULL(DATEDIFF(DAY, dbo.FN_GET_LAST_SALE_DATE(BE.INV_CODE,BE.BP_CODE), GETDATE()), 0)
+                        ELSE 0
+                    END AS [DAYS_FROM_LAST_SALE],
+                    ISNULL(BM.PHONE1, '') AS PHONE,
+                    ISNULL(BM.ADDRESS1, '') AS ADDRESS,
+                    LS.SBE_CODE,
+                    LS.SBE_NAME
+                FROM BP_EXCH BE
+                JOIN INV_MASTER IM ON BE.INV_CODE = IM.INV_CODE
+                JOIN BP_MASTER BM ON BE.BP_CODE = BM.BP_CODE
+                CROSS APPLY dbo.FN_GET_LAST_SALE_SBE(BE.INV_CODE, BE.BP_CODE) LS
+                WHERE BE.INV_CODE = :INV_CODE
+                ORDER BY BE.LIMIT - BE.QTY, [DAYS_FROM_LAST_SALE]""");
+
+        query.setParameter("INV_CODE", invCode);
+
+        return getExchangeInfos(result, query);
+    }
+
+    private List<ExchangeInfo> getExchangeInfos(List<ExchangeInfo> result, Query query) {
         List<Object[]> resultList = query.getResultList();
 
         for (Object[] item : resultList)
@@ -98,6 +164,8 @@ public class ExchangeLimitService
             exchangeInfo.setDaysFromLastSale((int) Double.parseDouble((String.valueOf(item[7]))));
             exchangeInfo.setPhone(String.valueOf(item[8]));
             exchangeInfo.setAddress(String.valueOf(item[9]));
+            exchangeInfo.setSbeCode(String.valueOf(item[10]));
+            exchangeInfo.setSbeName(String.valueOf(item[11]));
 
             result.add(exchangeInfo);
         }

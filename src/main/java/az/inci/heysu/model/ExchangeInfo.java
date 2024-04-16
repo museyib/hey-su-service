@@ -15,4 +15,6 @@ public class ExchangeInfo
     private Integer daysFromLastSale;
     private String phone;
     private String address;
+    private String sbeCode;
+    private String sbeName;
 }
