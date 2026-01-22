@@ -65,9 +65,10 @@ public class ReportService {
                         IM.INV_NAME,
                         IM.INV_BRAND_CODE,
                         ISNULL(IT.QTY, 0) AS QTY,
-                        ISNULL(WS_G.WHS_QTY, 0) AS WHS_QTY_G,
-                        ISNULL(WS_T20.WHS_QTY, 0) AS WHS_QTY_T20,
-                        ISNULL(WS_T29.WHS_QTY, 0) AS WHS_QTY_T29,
+                        ISNULL(WS_G.WHS_QTY - WS_G.RZV_QTY, 0) AS WHS_QTY_G,
+                        ISNULL(WS_T20.WHS_QTY - WS_T20.RZV_QTY, 0) AS WHS_QTY_T20,
+                        ISNULL(WS_T29.WHS_QTY - WS_T29.RZV_QTY, 0) AS WHS_QTY_T29,
+                        PL_L.PRICE AS PRICE_LST,
                         PL_S.PRICE AS PRICE_STD,
                         PL_P.PRICE AS PRICE_P01,
                         PL_V.PRICE AS PRICE_VP4,
@@ -111,11 +112,13 @@ public class ReportService {
                            WHERE WHS_CODE IN ('T29')
                            GROUP BY INV_CODE
                         ) WS_T29 ON IM.INV_CODE = WS_T29.INV_CODE
-                            LEFT JOIN PRICE_LIST PL_S ON IM.INV_CODE = PL_S.INV_CODE
+                            JOIN PRICE_LIST PL_L ON IM.INV_CODE = PL_L.INV_CODE
+                                                        AND PL_L.PRICE_CODE = 'LST'
+                            JOIN PRICE_LIST PL_S ON IM.INV_CODE = PL_S.INV_CODE
                                                         AND PL_S.PRICE_CODE = 'STD'
-                            LEFT JOIN PRICE_LIST PL_P ON IM.INV_CODE = PL_P.INV_CODE
+                            JOIN PRICE_LIST PL_P ON IM.INV_CODE = PL_P.INV_CODE
                                                         AND PL_P.PRICE_CODE = 'P01'
-                            LEFT JOIN PRICE_LIST PL_V ON IM.INV_CODE = PL_V.INV_CODE
+                            JOIN PRICE_LIST PL_V ON IM.INV_CODE = PL_V.INV_CODE
                                                         AND PL_V.PRICE_CODE = 'VP4'
                         WHERE IM.PRODUCER_CODE IN('1239')
                         OR IM.INV_CODE IN('a035398', 'a035338', 'a035335', 'a063989',
@@ -129,7 +132,6 @@ public class ReportService {
         return getMonthlySaleReports(result, query);
     }
 
-    @SuppressWarnings("unchecked")
     private List<MonthlySaleReport> getMonthlySaleReports(List<MonthlySaleReport> result, Query query)
     {
         List<Object[]> resultList = query.getResultList();
@@ -144,12 +146,13 @@ public class ReportService {
             reportItem.setMainWhsQty(Double.parseDouble(String.valueOf(item[4])));
             reportItem.setT20WhsQty(Double.parseDouble(String.valueOf(item[5])));
             reportItem.setT29WhsQty(Double.parseDouble(String.valueOf(item[6])));
-            reportItem.setPriceStd(Double.parseDouble(String.valueOf(item[7])));
-            reportItem.setPriceP01(Double.parseDouble(String.valueOf(item[8])));
-            reportItem.setPriceVp4(Double.parseDouble(String.valueOf(item[9])));
-            reportItem.setMainRzvQty(Double.parseDouble(String.valueOf(item[10])));
-            reportItem.setT20RzvQty(Double.parseDouble(String.valueOf(item[11])));
-            reportItem.setT29RzvQty(Double.parseDouble(String.valueOf(item[12])));
+            reportItem.setPriceLst(Double.parseDouble(String.valueOf(item[7])));
+            reportItem.setPriceStd(Double.parseDouble(String.valueOf(item[8])));
+            reportItem.setPriceP01(Double.parseDouble(String.valueOf(item[9])));
+            reportItem.setPriceVp4(Double.parseDouble(String.valueOf(item[10])));
+            reportItem.setMainRzvQty(Double.parseDouble(String.valueOf(item[11])));
+            reportItem.setT20RzvQty(Double.parseDouble(String.valueOf(item[12])));
+            reportItem.setT29RzvQty(Double.parseDouble(String.valueOf(item[13])));
 
             result.add(reportItem);
         }
@@ -165,8 +168,9 @@ public class ReportService {
                         SELECT IM.INV_CODE,
                         IM.INV_NAME,
                         IM.INV_BRAND_CODE,
-                        WS.WHS_QTY,
+                        WS.WHS_QTY - WS.RZV_QTY AS WHS_QTY,
                         WS.RZV_QTY,
+                        PL_L.PRICE AS PRICE_LST,
                         PL_S.PRICE AS PRICE_STD,
                         PL_P.PRICE AS PRICE_P01,
                         PL_V.PRICE AS PRICE_VP4
@@ -180,6 +184,8 @@ public class ReportService {
                            WHERE WHS_CODE = :WHS_CODE
                            GROUP BY INV_CODE
                         ) WS ON IM.INV_CODE = WS.INV_CODE
+                            JOIN PRICE_LIST PL_L ON IM.INV_CODE = PL_L.INV_CODE
+                                                        AND PL_L.PRICE_CODE = 'LST'
                             JOIN PRICE_LIST PL_S ON IM.INV_CODE = PL_S.INV_CODE
                                                         AND PL_S.PRICE_CODE = 'STD'
                             JOIN PRICE_LIST PL_P ON IM.INV_CODE = PL_P.INV_CODE
@@ -240,9 +246,10 @@ public class ReportService {
             reportItem.setBrandCode((String) item[2]);
             reportItem.setWhsQty(Double.parseDouble(String.valueOf(item[3])));
             reportItem.setRzvQty(Double.parseDouble(String.valueOf(item[4])));
-            reportItem.setPriceStd(Double.parseDouble(String.valueOf(item[5])));
-            reportItem.setPriceP01(Double.parseDouble(String.valueOf(item[6])));
-            reportItem.setPriceVp4(Double.parseDouble(String.valueOf(item[7])));
+            reportItem.setPriceLst(Double.parseDouble(String.valueOf(item[5])));
+            reportItem.setPriceStd(Double.parseDouble(String.valueOf(item[6])));
+            reportItem.setPriceP01(Double.parseDouble(String.valueOf(item[7])));
+            reportItem.setPriceVp4(Double.parseDouble(String.valueOf(item[8])));
 
             result.add(reportItem);
         }
