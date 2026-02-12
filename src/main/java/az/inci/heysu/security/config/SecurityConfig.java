@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,15 +22,16 @@ public class SecurityConfig
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
-    {
-         http.csrf().disable()
-             .authorizeHttpRequests().requestMatchers("/v2/authenticate").permitAll()
-                 .requestMatchers("/v2/**").authenticated()
-             .anyRequest().permitAll()
-             .and().sessionManagement().sessionCreationPolicy(STATELESS)
-             .and().authenticationProvider(authenticationProvider)
-             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+         http.csrf(AbstractHttpConfigurer::disable)
+                 .authorizeHttpRequests(matcherRegistry ->
+                     matcherRegistry.requestMatchers("/v2/authenticate").permitAll()
+                             .requestMatchers("/v2/**").authenticated()
+                             .anyRequest().permitAll())
+                 .sessionManagement(configurer ->
+                         configurer.sessionCreationPolicy(STATELESS))
+                 .authenticationProvider(authenticationProvider)
+                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

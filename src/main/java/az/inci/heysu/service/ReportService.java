@@ -74,7 +74,8 @@ public class ReportService {
                         PL_V.PRICE AS PRICE_VP4,
                         ISNULL(WS_G.RZV_QTY, 0) AS RZV_QTY_G,
                         ISNULL(WS_T20.RZV_QTY, 0) AS RZV_QTY_T20,
-                        ISNULL(WS_T29.RZV_QTY, 0) AS RZV_QTY_T29
+                        ISNULL(WS_T29.RZV_QTY, 0) AS RZV_QTY_T29,
+                        PL_P.MAX_DISCOUNT_RATIO
                         FROM INV_MASTER IM
                             LEFT JOIN
                         (
@@ -153,6 +154,7 @@ public class ReportService {
             reportItem.setMainRzvQty(Double.parseDouble(String.valueOf(item[11])));
             reportItem.setT20RzvQty(Double.parseDouble(String.valueOf(item[12])));
             reportItem.setT29RzvQty(Double.parseDouble(String.valueOf(item[13])));
+            reportItem.setMaxDiscountRatio(Double.parseDouble(String.valueOf(item[14])));
 
             result.add(reportItem);
         }
@@ -173,7 +175,8 @@ public class ReportService {
                         PL_L.PRICE AS PRICE_LST,
                         PL_S.PRICE AS PRICE_STD,
                         PL_P.PRICE AS PRICE_P01,
-                        PL_V.PRICE AS PRICE_VP4
+                        PL_V.PRICE AS PRICE_VP4,
+                        PL_P.MAX_DISCOUNT_RATIO
                         FROM INV_MASTER IM
                             JOIN
                         (
@@ -209,7 +212,8 @@ public class ReportService {
                         WS.RZV_QTY,
                         PL_S.PRICE AS PRICE_STD,
                         PL_P.PRICE AS PRICE_P01,
-                        PL_V.PRICE AS PRICE_VP4
+                        PL_V.PRICE AS PRICE_VP4,
+                        PL_P.MAX_DISCOUNT_RATIO
                         FROM INV_MASTER IM
                             JOIN
                         (
